@@ -8,7 +8,7 @@
 Player::Player() {}
 
 Player::Player(double x, double y, int health) {
-    this->image.load("Player.png");
+    this->image.load("images/Player.png");
     this->x = x;
     this->y = y;
     this->health = health;

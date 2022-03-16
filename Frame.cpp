@@ -8,31 +8,34 @@
 Frame::Frame(QGraphicsScene *) {
     setSceneRect(0, 0, 640, 480);
     setItemIndexMethod(QGraphicsScene::NoIndex);
-
-    QGraphicsTextItem *score_text = this->addText("SCORE : ");
-    score = this->addText(QString::number(points));
-    QFont f;
-    f.setPointSize(20);
-    score_text->setFont(f);
-    score->setFont(f);
-    score_text->setPos(0, this->height() - 30);
-    score->setPos(75, this->height() - 30);
-
+    setBackgroundBrush(QPixmap("images/background.png").scaled(600,400,Qt::KeepAspectRatioByExpanding));
     player = new Player(this->width()/2 - 4, this->height()/2-12, 50);
     addItem(player);
 
     auto *ticker = new QTimer;
     ticker->setSingleShot(false);
-    QObject::connect(ticker, &QTimer::timeout, this, &QGraphicsScene::advance);
-    QObject::connect(ticker, &QTimer::timeout, this, &Frame::tick);
     ticker->start(15);
-
-    timer = new QElapsedTimer;
-    timer->start();
 
     Asteroid *a = new Asteroid(0);
     asteroids.emplace_back(a);
     addItem(a);
+
+    timer = new QElapsedTimer;
+    timer->start();
+
+    QObject::connect(ticker, &QTimer::timeout, this, &QGraphicsScene::advance);
+    QObject::connect(ticker, &QTimer::timeout, this, &Frame::tick);
+
+    QFont f;
+    f.setPointSize(20);
+    QGraphicsTextItem *score_text = addText("SCORE : ");
+    score = this->addText(QString::number(points));
+    score_text->setFont(f);
+    score->setFont(f);
+    score_text->setPos(0, this->height() - 35);
+    score->setPos(95, this->height() - 35);
+    score_text->setDefaultTextColor(Qt::white);
+    score->setDefaultTextColor(Qt::white);
 }
 
 void Frame::tick() {

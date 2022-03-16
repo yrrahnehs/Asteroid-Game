@@ -9,7 +9,7 @@ Asteroid::Asteroid() {}
 
 Asteroid::Asteroid(int start) {
     time.restart();
-    image.load("asteroid.png");
+    image.load("images/asteroid.png");
 
     srand(std::time(nullptr));
 
