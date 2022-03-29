@@ -16,6 +16,8 @@ private:
     int size, health;
     QPixmap image;
     bool wKey, sKey, aKey, dKey;
+    bool hit;
+    QElapsedTimer *timer;
 
 public slots:
 
@@ -42,6 +44,8 @@ public:
     void SetAngle(double newAngle);
 
     void SetSpeed(double newSpeed);
+
+    void SetHit(bool newHit);
 
     int GetHealth();
 

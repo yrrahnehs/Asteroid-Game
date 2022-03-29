@@ -12,12 +12,12 @@
 
 class Asteroid : public QGraphicsItem {
 private:
-    bool firstspawned, dummy;
+    bool firstspawned, dummy, invul;
     double x, y;
-    double xvel, yvel;
+    double xvel, yvel, angle;
     int size;
     QPixmap image;
-    QElapsedTimer time;
+    QElapsedTimer time, invultimer;
 
 protected:
     void advance(int step) override;
@@ -27,6 +27,8 @@ public:
 
     Asteroid(int pos);
 
+    Asteroid(double x, double y, double angle, int size);
+
     double GetX() const;
 
     double GetY() const;
@@ -34,6 +36,10 @@ public:
     void SetX(double newX);
 
     void SetY(double newY);
+
+    bool GetInvul();
+
+    void SetInvul(bool newInvul);
 
     double GetXVel() const;
 

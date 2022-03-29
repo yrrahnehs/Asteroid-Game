@@ -53,8 +53,8 @@ bool Bullet::InFrame() {
 }
 
 QRectF Bullet::boundingRect() const {
-    QRectF hitbox = QRectF(GetX(), GetY(), this->size - 12, this->size - 6);
-    hitbox.translate(-GetX() - (this->size - 12) / 2, -GetY() - (this->size - 6) / 2);
+    QRectF hitbox = QRectF(GetX(), GetY(), this->size/2-2, this->size-2);
+    hitbox.translate(-GetX()-this->size/4 + 1,-GetY() - this->size/2 + 1);
     return hitbox;
 }
 
@@ -66,9 +66,9 @@ void Bullet::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
     painter->setBrush(brush);
 
 
-    QRectF b = QRectF(GetX(), GetY(), this->size/2, this->size);
+    QRectF b = QRectF(GetX(), GetY(), this->size/2-2, this->size-2);
     painter->rotate(GetAngle());
-    b.translate(-GetX()-this->size/4,-GetY() - this->size/2);
+    b.translate(-GetX()-this->size/4 + 1,-GetY() - this->size/2 + 1);
     painter->drawEllipse(b);
 
 

@@ -8,6 +8,8 @@
 Asteroid::Asteroid() {}
 
 Asteroid::Asteroid(int start) {
+    this->dummy = false;
+    this->invul = true;
     time.restart();
     image.load("images/asteroid.png");
 
@@ -42,69 +44,75 @@ Asteroid::Asteroid(int start) {
             this->y = rand() % (480 - this->size);
             this->x = (0 - this->size);
             break;
+        case 4:
+            this->dummy = true;
+            this->y = -100;
+            this->x = -100;
+            break;
     }
 
     setPos(this->x, this->y);
 
     // randomly generate a x and y velocity
-    double randomspeedx, randomspeedy;
-    randomspeedx = (QRandomGenerator().generateDouble() * 1.5) + 0.1;
-    randomspeedy = (QRandomGenerator().generateDouble() * 1.5) + 0.1;
-
-    // velocity based off of where asteroid spawns
+    double random_angle;
+    if (start == 0) {
+        if (this->x < 640/2) {
+            random_angle = rand() % 91 + 90;
+        }
+        if (this->x >= 640/2) {
+            random_angle = rand() % 91 + 180;
+        }
+    }
     if (start == 1) {
-        randomspeedx = -randomspeedx;
+        if (this->y < 480/2) {
+            random_angle = rand() % 91 + 180;
+        }
+        if (this->y >= 480/2) {
+            random_angle = rand() % 91 + 270;
+        }
     }
     if (start == 2) {
-        randomspeedy = -randomspeedy;
+        if (this->x < 640/2) {
+            random_angle = rand() % 91 + 0;
+        }
+        if (this->x >= 640/2) {
+            random_angle = rand() % 91 + 270;
+        }
+    }
+    if (start == 3) {
+        if (this->y < 480/2) {
+            random_angle = rand() % 91 + 90;
+        }
+        if (this->y >= 480/2) {
+            random_angle = rand() % 91 + 0;
+        }
     }
 
-    // velocity of y and x based off of a random number
-    int random_0_or_1 = rand() % 2;
+    this->angle = random_angle;
 
-    // if the asteroid spawns on the left or right side
-    if (start == 1 || start == 3) {
-        // if y position is more than 75% of the screen height
-        // and velocity is positive, change to negative
-        if (this->y >= (480 * 0.75) && randomspeedy > 0) {
-            randomspeedy = -randomspeedy;
-        }
-        // if y position is less than 25% of the screen height
-        // and velocity is negative, change to positive
-        if (this->y <= (480 * 0.25) && randomspeedy < 0) {
-            randomspeedy = -randomspeedy;
-        }
-        // if y position is in between 25% and 75%
-        // 50/50 to go up or down
-        if (this->y > (480 * 0.25) && this->y < (480 * 0.75)){
-            if (random_0_or_1 == 1) {
-                randomspeedy = -randomspeedy;
-            }
-        }
+    if (start == 4) {
+        this->yvel = 0;
     }
-    // if the asteroid spawns on the top or bottom side
-    if (start == 0 || start == 2) {
-        // if x position is more than 75% of the screen width
-        // and velocity is positive, change to negative
-        if (this->x >= (640 * 0.75) && randomspeedx > 0) {
-            randomspeedx = -randomspeedx;
-        }
-        // if x position is less than 25% of the screen width
-        // and velocity is negative, change to positive
-        if (this->x <= (640 * 0.25) && randomspeedx < 0) {
-            randomspeedx = -randomspeedx;
-        }
-        // if x position is in between 25% and 75%
-        // 50/50 to go left or right
-        if (this->x > (640 * 0.25) && this->x < (640 * 0.75)){
-            if (random_0_or_1 == 1) {
-                randomspeedx = -randomspeedx;
-            }
-        }
-    }
-    this->xvel = randomspeedx;
-    this->yvel = randomspeedy;
     this->firstspawned = true;
+    this->invultimer.restart();
+}
+
+Asteroid::Asteroid(double x, double y, double angle, int size) {
+    this->dummy = false;
+    this->invul = true;
+    time.restart();
+    image.load("images/asteroid.png");
+
+    this->angle = angle;
+    this->x = x;
+    this->y = y;
+    this->size = size;
+
+    setPos(this->x, this->y);
+//    480H 640W
+
+    this->firstspawned = false;
+    this->invultimer.restart();
 }
 
 double Asteroid::GetX() const {
@@ -121,6 +129,14 @@ void Asteroid::SetX(double newX) {
 
 void Asteroid::SetY(double newY) {
     this->y = newY;
+}
+
+bool Asteroid::GetInvul() {
+    return this->invul;
+}
+
+void Asteroid::SetInvul(bool newInvul) {
+    this->invul = newInvul;
 }
 
 double Asteroid::GetXVel() const {
@@ -156,8 +172,8 @@ QPixmap Asteroid::GetImage() {
 }
 
 QRectF Asteroid::boundingRect() const {
-    QRectF hitbox = QRectF(GetX(), GetY(), GetSize(), GetSize());
-    hitbox.translate(-GetX() - GetSize() / 2, -GetY() - GetSize() / 2);
+    QRectF hitbox = QRectF(GetX(), GetY(), GetSize()-10, GetSize()-10);
+    hitbox.translate(-GetX() - GetSize() / 2+7, -GetY() - GetSize() / 2+5);
     return hitbox;
 }
 
@@ -165,8 +181,9 @@ void Asteroid::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidge
     auto newPixmap = GetImage().scaled(GetSize(), GetSize());
     painter->drawPixmap(QPoint(-GetSize() / 2, -GetSize() / 2), newPixmap);
 
-//    QRectF hitbox = QRectF(GetX(), GetY(), GetSize(), GetSize());
-//    hitbox.translate(-GetX() - GetSize() / 2, -GetY() - GetSize() / 2);
+//    QRectF hitbox = QRectF(GetX(), GetY(), GetSize()-10, GetSize()-10);
+//    hitbox.translate(-GetX() - GetSize() / 2+7, -GetY() - GetSize() / 2+5);
+//    painter->setPen(QPen(Qt::white));
 //    painter->drawRect(hitbox);
 }
 
@@ -183,36 +200,40 @@ void Asteroid::MoveAsteroid() {
     setRotation(seconds * 100);
 
     // asteroid movement
-    SetX(GetX() + GetXVel());
-    SetY(GetY() + GetYVel());
-
+    SetX(GetX() + (1.5 * sin(qDegreesToRadians(angle))));
+    SetY(GetY() - (1.5 * cos(qDegreesToRadians(angle))));
     // set firstspawned to false after it appears on screen
     if (GetX() > 0 && GetX() < 640 && GetY() > 0 && GetY() < 480) {
         this->firstspawned = false;
     }
 
     if (!firstspawned) {
-        if (GetX() - GetSize() / 2 > 650 && GetXVel() > 0) {
+        if (GetX() - GetSize() / 2 > 650) {
             SetX(-GetSize() / 2);
         }
 
-        if (GetX() + GetSize() / 2 < 0 && GetXVel() < 0) {
+        if (GetX() + GetSize() / 2 < 0) {
             SetX(650 + GetSize() / 2);
         }
 
-        if (GetY() - GetSize() / 2 > 490 && GetYVel() > 0) {
+        if (GetY() - GetSize() / 2 > 490) {
             SetY(-GetSize() / 2);
         }
 
-        if (GetY() + GetSize() / 2 < 0 && GetYVel() < 0) {
+        if (GetY() + GetSize() / 2 < 0) {
             SetY(490 + GetSize() / 2);
         }
     }
-    if (dummy) {
-        if (GetX() > 100 || GetX() < -100) {
-            SetXVel(GetXVel() * -1);
-        }
+
+    if (invultimer.elapsed() > 500) {
+        SetInvul(false);
     }
+
+//    if (dummy) {
+//        if (GetX() > 100 || GetX() < -100) {
+//            SetXVel(GetXVel() * -1);
+//        }
+//    }
 
     setPos(GetX(), GetY());
 }

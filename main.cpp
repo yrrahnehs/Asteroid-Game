@@ -5,7 +5,7 @@ int main(int argc, char **argv) {
     QApplication app{argc, argv};
     Frame f;
     QGraphicsView view(&f);
-//    view.setBackgroundBrush(QPixmap("images/background.png").scaled(600,400,Qt::KeepAspectRatioByExpanding));
+    view.setBackgroundBrush(QPixmap("images/background.png").scaled(640,480,Qt::KeepAspectRatioByExpanding));
     view.setRenderHint(QPainter::Antialiasing);
     view.setCacheMode(QGraphicsView::CacheBackground);
     view.setViewportUpdateMode(QGraphicsView::FullViewportUpdate);

@@ -8,20 +8,28 @@
 Frame::Frame(QGraphicsScene *) {
     setSceneRect(0, 0, 640, 480);
     setItemIndexMethod(QGraphicsScene::NoIndex);
-    setBackgroundBrush(QPixmap("images/background.png").scaled(600,400,Qt::KeepAspectRatioByExpanding));
-    player = new Player(this->width()/2 - 4, this->height()/2-12, 50);
+    player = new Player(this->width() / 2 - 4, this->height() / 2 - 12, 50);
     addItem(player);
 
     auto *ticker = new QTimer;
     ticker->setSingleShot(false);
     ticker->start(15);
 
-    Asteroid *a = new Asteroid(0);
+    Asteroid *a = new Asteroid(4);
     asteroids.emplace_back(a);
     addItem(a);
 
+//    Asteroid *new_stroid1 = new Asteroid(100, 100, 45, 60);
+//    asteroids.emplace_back(new_stroid1);
+//    addItem(new_stroid1);
+
     timer = new QElapsedTimer;
     timer->start();
+
+    reload_timer = new QElapsedTimer;
+    reload_timer->start();
+
+    invul = new QElapsedTimer;
 
     QObject::connect(ticker, &QTimer::timeout, this, &QGraphicsScene::advance);
     QObject::connect(ticker, &QTimer::timeout, this, &Frame::tick);
@@ -47,32 +55,56 @@ void Frame::tick() {
         asteroids.emplace_back(p);
         timer->restart();
     }
-
+    srand(time(nullptr));
     // player asteroid collision
     for (int j = 0; j < asteroids.size(); j++) {
         if (player->collidesWithItem(asteroids[j])) {
+            if (invul->elapsed() >= 2750) {
+                player->SetHealth(player->GetHealth() - 10);
+                invul->restart();
+            }
+
+            player->SetHit(true);
+
             removeItem(asteroids[j]);
             asteroids.erase(std::remove(asteroids.begin(), asteroids.end(), asteroids[j]),
                             asteroids.end());
         }
     }
 
-    // bullets and asteroid collision
+    if (invul->elapsed() >= 2750) {
+        player->SetHit(false);
+    }
+
     for (int j = 0; j < bullets.size(); j++) {
+        // if bullets are not in frame, remove them
         if (!bullets[j]->InFrame()) {
             removeItem(bullets[j]);
             bullets.erase(std::remove(bullets.begin(), bullets.end(), bullets[j]), bullets.end());
         }
 
+        // bullets and asteroids collision
         for (int i = 0; i < asteroids.size(); i++) {
-            if (asteroids[i]->collidesWithItem(bullets[j])) {
+            if (asteroids[i]->collidesWithItem(bullets[j]) && !asteroids[i]->GetInvul()) {
+                double randomangle1, randomangle2;
+
+                randomangle1 = rand() % 361;
+                randomangle2 = randomangle1 + 180;
+
+                if (asteroids[i]->GetSize() != 40) {
+                    Asteroid *new_stroid1 = new Asteroid(asteroids[i]->GetX(), asteroids[i]->GetY(), randomangle1, asteroids[i]->GetSize() - 10);
+                    Asteroid *new_stroid2 = new Asteroid(asteroids[i]->GetX(), asteroids[i]->GetY(), randomangle2, asteroids[i]->GetSize() - 10);
+                    asteroids.emplace_back(new_stroid1);
+                    asteroids.emplace_back(new_stroid2);
+                    addItem(new_stroid1);
+                    addItem(new_stroid2);
+                }
+                removeItem(bullets[j]);
+                bullets.erase(std::remove(bullets.begin(), bullets.end(), bullets[j]), bullets.end());
 
                 removeItem(asteroids[i]);
                 asteroids.erase(std::remove(asteroids.begin(), asteroids.end(), asteroids[i]),
                                 asteroids.end());
-
-                removeItem(bullets[j]);
-                bullets.erase(std::remove(bullets.begin(), bullets.end(), bullets[j]), bullets.end());
 
                 points++;
                 score->setPlainText(QString::number(points));
@@ -96,10 +128,13 @@ void Frame::keyPressEvent(QKeyEvent *event) {
             player->SetKey(3, true);
             break;
     }
-    if (event->key() == Qt::Key_Space) {
-        auto *newBullet = new Bullet(player->GetX(), player->GetY(), player->GetAngle());
-        this->addItem(newBullet);
-        bullets.emplace_back(newBullet);
+    if (reload_timer->elapsed() >= 250) {
+        if (event->key() == Qt::Key_Space) {
+            auto *newBullet = new Bullet(player->GetX(), player->GetY(), player->GetAngle());
+            this->addItem(newBullet);
+            bullets.emplace_back(newBullet);
+            reload_timer->restart();
+        }
     }
 }
 

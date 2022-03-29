@@ -12,13 +12,13 @@
 #include "Bullet.h"
 
 class Frame : public QGraphicsScene {
-    Q_OBJECT
-            QPoint
-    mouse_pos;
+Q_OBJECT
+    QPoint
+            mouse_pos;
 public:
     Frame(QGraphicsScene *parent = nullptr);
 
-    signals:
+signals:
 
 public
     slots:
@@ -32,6 +32,9 @@ protected:
 
 private:
     QElapsedTimer *timer;
+    QElapsedTimer *reload_timer;
+    QElapsedTimer *invul;
+
     Player *player;
     std::vector<Asteroid *> asteroids;
     std::vector<Bullet *> bullets;

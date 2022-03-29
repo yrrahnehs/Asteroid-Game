@@ -15,11 +15,15 @@ Player::Player(double x, double y, int health) {
     this->size = 30;
     this->angle = 0;
     this->speed = 1.7;
+    this->hit = false;
 
     wKey = false;
     sKey = false;
     aKey = false;
     dKey = false;
+
+    timer = new QElapsedTimer;
+    timer->start();
 }
 
 double Player::GetX() const {
@@ -60,6 +64,10 @@ void Player::SetHealth(int newHealth) {
     this->health = newHealth;
 }
 
+void Player::SetHit(bool newHit) {
+    this->hit = newHit;
+}
+
 double Player::GetAngle() {
     return this->angle;
 }
@@ -87,7 +95,20 @@ void Player::paint(QPainter *painter, const QStyleOptionGraphicsItem *qStyleOpti
 
     painter->rotate(GetAngle());
 
+    if (this->hit) {
+        if (timer->elapsed() <= 250) {
+            painter->setOpacity(0.5);
+        }
+        if (timer->elapsed() > 250) {
+            painter->setOpacity(1);
+        }
+        if (timer->elapsed() >= 500) {
+            timer->restart();
+        }
+    }
+
     painter->drawPixmap(QPoint(-this->size / 2, -this->size / 2), newPixmap);
+
 
 //    QRectF hitbox = QRectF(GetX(), GetY(), this->size - 12, this->size - 6);
 //    hitbox.translate(-GetX() - (this->size - 12) / 2, -GetY() - (this->size - 6) / 2);
@@ -110,10 +131,10 @@ void Player::MovePlayer() {
         }
 
         if (aKey) {
-            SetAngle(GetAngle() - 2);
+            SetAngle(GetAngle() - 3.5);
         }
         if (dKey) {
-            SetAngle(GetAngle() + 2);
+            SetAngle(GetAngle() + 3.5);
         }
     }
 
