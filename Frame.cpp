@@ -41,9 +41,18 @@ Frame::Frame(QGraphicsScene *) {
     score_text->setFont(f);
     score->setFont(f);
     score_text->setPos(0, this->height() - 35);
-    score->setPos(95, this->height() - 35);
+    score->setPos(100, this->height() - 35);
     score_text->setDefaultTextColor(Qt::white);
     score->setDefaultTextColor(Qt::white);
+
+    QGraphicsTextItem *health_text = addText("HEALTH : ");
+    health = this->addText(QString::number(player->GetHealth()));
+    health_text->setFont(f);
+    health->setFont(f);
+    health_text->setPos(this->width() - 150, this->height() - 35);
+    health->setPos(this->width() - 40, this->height() - 35);
+    health_text->setDefaultTextColor(Qt::white);
+    health->setDefaultTextColor(Qt::white);
 }
 
 void Frame::tick() {
@@ -56,12 +65,14 @@ void Frame::tick() {
         timer->restart();
     }
     srand(time(nullptr));
+
     // player asteroid collision
     for (int j = 0; j < asteroids.size(); j++) {
         if (player->collidesWithItem(asteroids[j])) {
             if (invul->elapsed() >= 2750) {
                 player->SetHealth(player->GetHealth() - 10);
                 invul->restart();
+                health->setPlainText(QString::number(player->GetHealth()));
             }
 
             player->SetHit(true);

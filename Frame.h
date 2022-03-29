@@ -40,7 +40,7 @@ private:
     std::vector<Bullet *> bullets;
     QPixmap background;
 
-    QGraphicsTextItem *score;
+    QGraphicsTextItem *score, *health;
 
     int points = 0;
 

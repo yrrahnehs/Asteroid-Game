@@ -13,7 +13,7 @@
 class Asteroid : public QGraphicsItem {
 private:
     bool firstspawned, dummy, invul;
-    double x, y;
+    double x, y, speed;
     double xvel, yvel, angle;
     int size;
     QPixmap image;

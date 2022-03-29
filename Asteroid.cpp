@@ -20,10 +20,13 @@ Asteroid::Asteroid(int start) {
     // randomly generate asteroid size
     if (randomnumber < 3) {
         this->size = 60;
+        this->speed = 0.9;
     } else if (randomnumber > 5) {
         this->size = 40;
+        this->speed = 1.5;
     } else {
         this->size = 50;
+        this->speed = 1.2;
     }
 
     // starting asteroid spawn position
@@ -53,7 +56,7 @@ Asteroid::Asteroid(int start) {
 
     setPos(this->x, this->y);
 
-    // randomly generate a x and y velocity
+    // randomly generate starting spawn angle
     double random_angle;
     if (start == 0) {
         if (this->x < 640/2) {
@@ -107,6 +110,12 @@ Asteroid::Asteroid(double x, double y, double angle, int size) {
     this->x = x;
     this->y = y;
     this->size = size;
+    if (size == 50) {
+        this->speed = 1.2;
+    }
+    if (size == 40) {
+        this->speed = 1.5;
+    }
 
     setPos(this->x, this->y);
 //    480H 640W
@@ -200,8 +209,8 @@ void Asteroid::MoveAsteroid() {
     setRotation(seconds * 100);
 
     // asteroid movement
-    SetX(GetX() + (1.5 * sin(qDegreesToRadians(angle))));
-    SetY(GetY() - (1.5 * cos(qDegreesToRadians(angle))));
+    SetX(GetX() + (this->speed * sin(qDegreesToRadians(angle))));
+    SetY(GetY() - (this->speed * cos(qDegreesToRadians(angle))));
     // set firstspawned to false after it appears on screen
     if (GetX() > 0 && GetX() < 640 && GetY() > 0 && GetY() < 480) {
         this->firstspawned = false;
@@ -225,7 +234,7 @@ void Asteroid::MoveAsteroid() {
         }
     }
 
-    if (invultimer.elapsed() > 500) {
+    if (invultimer.elapsed() > 100) {
         SetInvul(false);
     }
 
