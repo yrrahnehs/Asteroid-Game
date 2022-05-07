@@ -181,7 +181,7 @@ void Gameplay::tick() {
         }
     }
 
-    if (player->GetHealth() == 40) {
+    if (player->GetHealth() <= 0) {
         endGameScreen();
         for (Asteroid *&asteroid: asteroids) {
             removeItem(asteroid);
