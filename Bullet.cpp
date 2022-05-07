@@ -70,18 +70,6 @@ void Bullet::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
     painter->rotate(GetAngle());
     b.translate(-GetX()-this->size/4 + 1,-GetY() - this->size/2 + 1);
     painter->drawEllipse(b);
-
-
-//    QPen pen = QPen(Qt::white);
-//    Qt::BrushStyle style1 = Qt::NoBrush;
-//    QBrush brush1(Qt::white, style1);
-//    painter->setPen(pen);
-//    painter->setBrush(brush1);
-//
-//    QRectF hitbox = QRectF(GetX(), GetY(), this->size/2, this->size);
-//    hitbox.translate(-GetX()-this->size/4,-GetY() - this->size/2);
-//    painter->drawRect(hitbox);
-
 }
 
 void Bullet::advance(int step) {
@@ -96,3 +84,5 @@ void Bullet::MoveBullet() {
     SetX(GetX() + (GetSpeed() * sin(qDegreesToRadians(angle))));
     setPos(GetX(), GetY());
 }
+
+Bullet::~Bullet() = default;

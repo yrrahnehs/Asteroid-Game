@@ -7,14 +7,14 @@
 
 
 #include <QtWidgets>
-#include <time.h>
+#include <ctime>
 
 
 class Asteroid : public QGraphicsItem {
 private:
-    bool firstspawned, dummy, invul;
+    bool firstspawned, invul;
     double x, y, speed;
-    double xvel, yvel, angle;
+    double angle;
     int size;
     QPixmap image;
     QElapsedTimer time, invultimer;
@@ -29,6 +29,8 @@ public:
 
     Asteroid(double x, double y, double angle, int size);
 
+    ~Asteroid();
+
     double GetX() const;
 
     double GetY() const;
@@ -41,14 +43,6 @@ public:
 
     void SetInvul(bool newInvul);
 
-    double GetXVel() const;
-
-    double GetYVel() const;
-
-    void SetXVel(double newXVel);
-
-    void SetYVel(double newYVel);
-
     bool GetFirstSpawned();
 
     void SetFirstSpawned(bool change);
@@ -60,8 +54,6 @@ public:
     QRectF boundingRect() const override;
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-
-    void DrawAsteroid(QPainter &qPainter);
 
     void MoveAsteroid();
 };

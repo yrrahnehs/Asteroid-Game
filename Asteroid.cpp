@@ -8,7 +8,6 @@
 Asteroid::Asteroid() {}
 
 Asteroid::Asteroid(int start) {
-    this->dummy = false;
     this->invul = true;
     time.restart();
     image.load("images/asteroid.png");
@@ -48,7 +47,6 @@ Asteroid::Asteroid(int start) {
             this->x = (0 - this->size);
             break;
         case 4:
-            this->dummy = true;
             this->y = -100;
             this->x = -100;
             break;
@@ -57,51 +55,46 @@ Asteroid::Asteroid(int start) {
     setPos(this->x, this->y);
 
     // randomly generate starting spawn angle
-    double random_angle;
+    double random_angle = 0.0;
     if (start == 0) {
-        if (this->x < 640/2) {
-            random_angle = rand() % 91 + 90;
+        if (this->x < 640.0/2) {
+            random_angle = rand() % 81 + 95;
         }
-        if (this->x >= 640/2) {
-            random_angle = rand() % 91 + 180;
+        if (this->x >= 640.0/2) {
+            random_angle = rand() % 81 + 185;
         }
     }
     if (start == 1) {
-        if (this->y < 480/2) {
-            random_angle = rand() % 91 + 180;
+        if (this->y < 480.0/2) {
+            random_angle = rand() % 81 + 185;
         }
-        if (this->y >= 480/2) {
-            random_angle = rand() % 91 + 270;
+        if (this->y >= 480.0/2) {
+            random_angle = rand() % 81 + 275;
         }
     }
     if (start == 2) {
-        if (this->x < 640/2) {
-            random_angle = rand() % 91 + 0;
+        if (this->x < 640.0/2) {
+            random_angle = rand() % 81 + 5;
         }
-        if (this->x >= 640/2) {
-            random_angle = rand() % 91 + 270;
+        if (this->x >= 640.0/2) {
+            random_angle = rand() % 81 + 275;
         }
     }
     if (start == 3) {
-        if (this->y < 480/2) {
-            random_angle = rand() % 91 + 90;
+        if (this->y < 480.0/2) {
+            random_angle = rand() % 86 + 95;
         }
-        if (this->y >= 480/2) {
-            random_angle = rand() % 91 + 0;
+        if (this->y >= 480.0/2) {
+            random_angle = rand() % 86 + 5;
         }
     }
 
     this->angle = random_angle;
-
-    if (start == 4) {
-        this->yvel = 0;
-    }
     this->firstspawned = true;
     this->invultimer.restart();
 }
 
 Asteroid::Asteroid(double x, double y, double angle, int size) {
-    this->dummy = false;
     this->invul = true;
     time.restart();
     image.load("images/asteroid.png");
@@ -118,7 +111,6 @@ Asteroid::Asteroid(double x, double y, double angle, int size) {
     }
 
     setPos(this->x, this->y);
-//    480H 640W
 
     this->firstspawned = false;
     this->invultimer.restart();
@@ -148,22 +140,6 @@ void Asteroid::SetInvul(bool newInvul) {
     this->invul = newInvul;
 }
 
-double Asteroid::GetXVel() const {
-    return this->xvel;
-}
-
-double Asteroid::GetYVel() const {
-    return this->yvel;
-}
-
-void Asteroid::SetXVel(double newXVel) {
-    this->xvel = newXVel;
-}
-
-void Asteroid::SetYVel(double newYVel) {
-    this->yvel = newYVel;
-}
-
 bool Asteroid::GetFirstSpawned() {
     return this->firstspawned;
 }
@@ -189,11 +165,6 @@ QRectF Asteroid::boundingRect() const {
 void Asteroid::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     auto newPixmap = GetImage().scaled(GetSize(), GetSize());
     painter->drawPixmap(QPoint(-GetSize() / 2, -GetSize() / 2), newPixmap);
-
-//    QRectF hitbox = QRectF(GetX(), GetY(), GetSize()-10, GetSize()-10);
-//    hitbox.translate(-GetX() - GetSize() / 2+7, -GetY() - GetSize() / 2+5);
-//    painter->setPen(QPen(Qt::white));
-//    painter->drawRect(hitbox);
 }
 
 void Asteroid::advance(int step) {
@@ -213,7 +184,7 @@ void Asteroid::MoveAsteroid() {
     SetY(GetY() - (this->speed * cos(qDegreesToRadians(angle))));
     // set firstspawned to false after it appears on screen
     if (GetX() > 0 && GetX() < 640 && GetY() > 0 && GetY() < 480) {
-        this->firstspawned = false;
+        SetFirstSpawned(false);
     }
 
     if (!firstspawned) {
@@ -238,11 +209,7 @@ void Asteroid::MoveAsteroid() {
         SetInvul(false);
     }
 
-//    if (dummy) {
-//        if (GetX() > 100 || GetX() < -100) {
-//            SetXVel(GetXVel() * -1);
-//        }
-//    }
-
     setPos(GetX(), GetY());
 }
+
+Asteroid::~Asteroid() = default;

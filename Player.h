@@ -12,11 +12,16 @@ class Player : public QGraphicsItem{
 
 private:
     double x, y;
-    double angle, speed;
-    int size, health;
+    double angle = 0;
+    double speed = 1.7;
+    int size = 30;
+    int health;
     QPixmap image;
-    bool wKey, sKey, aKey, dKey;
-    bool hit;
+    bool wKey = false;
+    bool sKey = false;
+    bool aKey = false;
+    bool dKey = false;
+    bool hit = false;
     QElapsedTimer *timer;
 
 public slots:
@@ -28,6 +33,8 @@ public:
     Player();
 
     Player(double x, double y, int health);
+
+    ~Player();
 
     double GetX() const;
 
@@ -54,8 +61,6 @@ public:
     bool InFrame(double offsetx, double offsety);
 
     QPixmap GetImage();
-
-    void SetImage(QString imageName);
 
     QRectF boundingRect() const override;
 

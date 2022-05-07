@@ -12,15 +12,6 @@ Player::Player(double x, double y, int health) {
     this->x = x;
     this->y = y;
     this->health = health;
-    this->size = 30;
-    this->angle = 0;
-    this->speed = 1.7;
-    this->hit = false;
-
-    wKey = false;
-    sKey = false;
-    aKey = false;
-    dKey = false;
 
     timer = new QElapsedTimer;
     timer->start();
@@ -41,7 +32,6 @@ void Player::SetX(double newX) {
 void Player::SetY(double newY) {
     this->y = newY;
 }
-
 
 double Player::GetSpeed() const {
     return this->speed;
@@ -80,10 +70,6 @@ QPixmap Player::GetImage() {
     return this->image;
 }
 
-void Player::SetImage(QString imageName) {
-    this->image.load(imageName);
-}
-
 QRectF Player::boundingRect() const {
     QRectF hitbox = QRectF(GetX(), GetY(), this->size - 12, this->size - 6);
     hitbox.translate(-GetX() - (this->size - 12) / 2, -GetY() - (this->size - 6) / 2);
@@ -96,23 +82,18 @@ void Player::paint(QPainter *painter, const QStyleOptionGraphicsItem *qStyleOpti
     painter->rotate(GetAngle());
 
     if (this->hit) {
-        if (timer->elapsed() <= 250) {
+        if (timer->elapsed() <= 100) {
             painter->setOpacity(0.5);
         }
-        if (timer->elapsed() > 250) {
+        if (timer->elapsed() > 100) {
             painter->setOpacity(1);
         }
-        if (timer->elapsed() >= 500) {
+        if (timer->elapsed() >= 200) {
             timer->restart();
         }
     }
 
     painter->drawPixmap(QPoint(-this->size / 2, -this->size / 2), newPixmap);
-
-
-//    QRectF hitbox = QRectF(GetX(), GetY(), this->size - 12, this->size - 6);
-//    hitbox.translate(-GetX() - (this->size - 12) / 2, -GetY() - (this->size - 6) / 2);
-//    painter->drawRect(hitbox);
 }
 
 void Player::advance(int step) {
@@ -179,4 +160,8 @@ void Player::SetKey(int keyVal, bool newState) {
             dKey = newState;
             break;
     }
+}
+
+Player::~Player() {
+    delete timer;
 }

@@ -14,7 +14,6 @@ private:
     double x, y, angle;
     double speed;
     int size;
-    QElapsedTimer time;
 
 public slots:
 
@@ -25,6 +24,8 @@ public:
     Bullet();
 
     Bullet(double x, double y, double angle);
+
+    ~Bullet();
 
     double GetX() const;
 

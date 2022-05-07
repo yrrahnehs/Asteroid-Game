@@ -13,7 +13,7 @@ find_package(Qt6 COMPONENTS
         Widgets
         REQUIRED)
 
-add_executable(AsteroidGame2 main.cpp Frame.cpp Frame.h Asteroid.cpp Asteroid.h Player.cpp Player.h Bullet.cpp Bullet.h)
+add_executable(AsteroidGame2 main.cpp Gameplay.cpp Gameplay.h Asteroid.cpp Asteroid.h Player.cpp Player.h Bullet.cpp Bullet.h)
 target_link_libraries(AsteroidGame2
         Qt::Core
         Qt::Gui
