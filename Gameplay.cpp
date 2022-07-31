@@ -7,21 +7,28 @@
 #include <QAbstractButton>
 
 
+
+
 Gameplay::Gameplay(QGraphicsScene *) {
     srand(std::time(nullptr));
+    // sets up screen size
     setSceneRect(0, 0, 640, 480);
     setItemIndexMethod(QGraphicsScene::NoIndex);
 
+    // boolean for changing respawn rate
     toggle = false;
 
-    ticker->setSingleShot(false);
     ticker->start(15);
+#ifdef __APPLE__
+#define OFFSET 85
+#endif
 
     QFont f;
     f.setPointSize(60);
+    // title text
     title_text = addText("A S T E R O I D S");
     title_text->setFont(f);
-    title_text->setPos(30, 60);
+    title_text->setPos(30 + OFFSET, 60);
     title_text->setDefaultTextColor(Qt::white);
 
     f.setPointSize(40);
@@ -29,11 +36,13 @@ Gameplay::Gameplay(QGraphicsScene *) {
     QPalette palette1;
     palette1.setColor(QPalette::Window, Qt::black);
 
+    // start button
     startbutton = new QPushButton("START");
     startbutton->setGeometry(QRect(this->width() / 2 - 40, this->height() / 2 + 30, 80, 30));
     QGraphicsWidget *startBtn = this->addWidget(startbutton);
     startBtn->setPalette(palette1);
 
+    // quit button
     quitbutton = new QPushButton("QUIT");
     quitbutton->setGeometry(QRect(this->width() / 2 - 40, this->height() / 2 + 90, 80, 30));
     QGraphicsWidget *quitBtn = this->addWidget(quitbutton);
@@ -44,6 +53,7 @@ Gameplay::Gameplay(QGraphicsScene *) {
     startBtn->setFont(f);
     quitBtn->setFont(f);
 
+    // connect start button and timer to startGame and advance() respectively
     QObject::connect(startbutton, &QPushButton::released, this, &Gameplay::startGame);
     QObject::connect(ticker, &QTimer::timeout, this, &QGraphicsScene::advance);
 }
@@ -53,8 +63,14 @@ void Gameplay::startGame() {
     f.setPointSize(20);
     respawnrate = 6000;
 
-    player = new Player(this->width() / 2 - 4, this->height() / 2 - 12, 50);
+    player = new Player(this->width() / 2 - 4, this->height() / 2 - 12, 10);
     addItem(player);
+
+
+#ifdef __APPLE__
+#undef OFFSET
+#define OFFSET 25
+#endif
 
     // score text
     points = 0;
@@ -64,7 +80,7 @@ void Gameplay::startGame() {
     score = this->addText(QString::number(points));
     score_text->setFont(f);
     score->setFont(f);
-    score_text->setPos(0, this->height() - 35);
+    score_text->setPos(0 + OFFSET, this->height() - 35);
     score->setPos(100, this->height() - 35);
     score_text->setDefaultTextColor(Qt::white);
     score->setDefaultTextColor(Qt::white);
@@ -79,7 +95,7 @@ void Gameplay::startGame() {
     health_text->setFont(f);
     health->setFont(f);
     health_text->setPos(this->width() - 150, this->height() - 35);
-    health->setPos(this->width() - 40, this->height() - 35);
+    health->setPos(this->width() - 40 - OFFSET, this->height() - 35);
     health_text->setDefaultTextColor(Qt::white);
     health->setDefaultTextColor(Qt::white);
 
@@ -89,13 +105,11 @@ void Gameplay::startGame() {
     // player invulnerability timer
     invul->restart();
 
+    startbutton->deleteLater();
+    quitbutton->deleteLater();
+    title_text->deleteLater();
+
     QObject::connect(ticker, &QTimer::timeout, this, &Gameplay::tick);
-
-    delete startbutton;
-
-    delete quitbutton;
-
-    delete title_text;
 
 }
 
@@ -194,17 +208,22 @@ void Gameplay::tick() {
 }
 
 void Gameplay::endGameScreen() {
-    delete score;
-    delete health;
-    delete score_text;
-    delete health_text;
+#ifdef __APPLE__
+#undef OFFSET
+#define OFFSET 50
+#endif
+
+    score->deleteLater();
+    health->deleteLater();
+    score_text->deleteLater();
+    health_text->deleteLater();
 
     QFont f;
     f.setPointSize(60);
     title_text = new QGraphicsTextItem;
     title_text = addText("GAME OVER");
     title_text->setFont(f);
-    title_text->setPos(this->width() / 2 - 220, 60);
+    title_text->setPos(this->width() / 2 - 220 + OFFSET, 60);
     title_text->setDefaultTextColor(Qt::white);
 
     f.setPointSize(40);
@@ -236,73 +255,52 @@ void Gameplay::quit() {
 }
 
 void Gameplay::keyPressEvent(QKeyEvent *event) {
-    switch (event->key()) {
-        case Qt::Key_W:
-            player->SetKey(0, true);
-            break;
-        case Qt::Key_A:
-            player->SetKey(1, true);
-            break;
-        case Qt::Key_S:
-            player->SetKey(2, true);
-            break;
-        case Qt::Key_D:
-            player->SetKey(3, true);
-            break;
-    }
-    if (reload_timer->elapsed() >= 250) {
-        if (event->key() == Qt::Key_Space) {
-            auto *newBullet = new Bullet(player->GetX(), player->GetY(), player->GetAngle());
-            this->addItem(newBullet);
-            bullets.emplace_back(newBullet);
-            reload_timer->restart();
+    if (player != nullptr) {
+        switch (event->key()) {
+            case Qt::Key_W:
+                player->SetKey(0, true);
+                break;
+            case Qt::Key_A:
+                player->SetKey(1, true);
+                break;
+            case Qt::Key_S:
+                player->SetKey(2, true);
+                break;
+            case Qt::Key_D:
+                player->SetKey(3, true);
+                break;
+        }
+        if (reload_timer->elapsed() >= 250) {
+            if (event->key() == Qt::Key_Space) {
+                auto *newBullet = new Bullet(player->GetX(), player->GetY(), player->GetAngle());
+                this->addItem(newBullet);
+                bullets.emplace_back(newBullet);
+                reload_timer->restart();
+            }
         }
     }
 }
 
 void Gameplay::keyReleaseEvent(QKeyEvent *event) {
-    switch (event->key()) {
-        case Qt::Key_W:
-            player->SetKey(0, false);
-            break;
-        case Qt::Key_A:
-            player->SetKey(1, false);
-            break;
-        case Qt::Key_S:
-            player->SetKey(2, false);
-            break;
-        case Qt::Key_D:
-            player->SetKey(3, false);
-            break;
+    if (player != nullptr) {
+        switch (event->key()) {
+            case Qt::Key_W:
+                player->SetKey(0, false);
+                break;
+            case Qt::Key_A:
+                player->SetKey(1, false);
+                break;
+            case Qt::Key_S:
+                player->SetKey(2, false);
+                break;
+            case Qt::Key_D:
+                player->SetKey(3, false);
+                break;
+        }
     }
 }
 
 Gameplay::~Gameplay() {
-    delete ticker;
-    delete timer;
-    delete reload_timer;
-    delete invul;
 
-    delete score;
-    delete health;
-    delete score_text;
-    delete health_text;
-
-    if (player != nullptr) {
-        removeItem(player);
-        delete player;
-    }
-    if (!asteroids.empty()) {
-        for (Asteroid *&asteroid: asteroids) {
-            removeItem(asteroid);
-            delete asteroid;
-        }
-    }
-    if (!bullets.empty()) {
-        for (Bullet *&bullet: bullets) {
-            removeItem(bullet);
-            delete bullet;
-        }
-    }
 }
 
