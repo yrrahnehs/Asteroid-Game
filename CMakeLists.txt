@@ -19,3 +19,4 @@ target_link_libraries(AsteroidGame2
         Qt::Gui
         Qt::Widgets
         )
+file(COPY images DESTINATION ${CMAKE_BINARY_DIR})

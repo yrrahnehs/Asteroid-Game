@@ -63,7 +63,7 @@ void Gameplay::startGame() {
     f.setPointSize(20);
     respawnrate = 6000;
 
-    player = new Player(this->width() / 2 - 4, this->height() / 2 - 12, 10);
+    player = new Player(this->width() / 2 - 4, this->height() / 2 - 12, 50);
     addItem(player);
 
 
