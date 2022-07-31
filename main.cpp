@@ -1,6 +1,8 @@
 #include <QApplication>
 #include "Gameplay.h"
 
+class Gameplay;
+
 int main(int argc, char **argv) {
     QApplication app{argc, argv};
     Gameplay g;
